@@ -8,21 +8,24 @@ import { MoonIcon, SunIcon, LinkIcon } from '@heroicons/vue/24/solid'
 // instanciar useThemeStore
 // crear variable reactiva con objeto useStore
 
-
+import { useThemeStore } from './stores/ThemeStore';
+import { reactive } from 'vue';
+const themeStore = useThemeStore()
+const theme = reactive(themeStore)
 </script>
 
 <template>
   <!-- usar directiva v-bind:class para asinar clase class si isDark en el store es true -->
-  <div class="wrapper transition ease-linear">
+  <div class="transition ease-linear" :class="theme.isDark ? 'wrapper-dark' : 'wrapper'">
     <div class="btn-wrapper">
       <div class="toggle-btn flex items-center justify-center w-full my-4">
         <label for="toggle" class="flex items-center justify-center cursor-pointer">
           <div class="relative">
             <!-- usar directiva @click para ejecutar el metodo para cambiar de dark a light o viceversa -->
-            <input type="checkbox" id="toggle" class="sr-only"/>
+            <input type="checkbox" id="toggle" class="sr-only" @click="theme.changeTheme"/>
             <div class="block bg-gray-600 w-14 h-8 rounded-full"></div>
             <div
-              class="dot absolute left-1 top-1 bg-black w-6 h-6 flex items-center justify-center rounded-full transition">
+              class="dot absolute left-1 top-1 bg-black w-6 h-6 flex items-center justify-center rounded-full transition" v-if="theme.isDark ? MoonIcon : SunIcon">
               <!-- usar directiva v-if  para mostrar el icono de luna o sol usando isDark como referencia -->
               <MoonIcon class="w-4 h-4 text-white" />
               <SunIcon class="w-full h-full text-yellow-500 p-1" />
@@ -30,13 +33,13 @@ import { MoonIcon, SunIcon, LinkIcon } from '@heroicons/vue/24/solid'
           </div>
 
           <!-- cambiar usar v-bind:class y atributo mode del ThemeState para cambiar el texto -->
-          <div class="label-text ml-2 font-medium">
-            Modo </div>
+          <div class="ml-2 font-medium" :class="[theme.isDark ? 'label-text.dark' : 'label-text',theme.mode]">
+          {{ theme.mode }}</div>
         </label>
       </div>
     </div>
     <!-- usar directiva v-bind:class para asinar clase class si isDark en el store es true -->
-    <div class="img min-h-screen flex flex-col items-center transition"></div>
+    <div class="min-h-screen flex flex-col items-center transition" :class="theme.isDark ? 'img-dark' : 'img'"></div>
     <div class="todo flex-1 lg:w-2/3 xl:w-2/5 w-full px-7">
       <RouterView />
     </div>
@@ -55,7 +58,7 @@ import { MoonIcon, SunIcon, LinkIcon } from '@heroicons/vue/24/solid'
   background: #fff;
 }
 
-.wrapper.dark {
+.wrapper-dark {
   background: #434343;
 }
 
@@ -66,7 +69,7 @@ import { MoonIcon, SunIcon, LinkIcon } from '@heroicons/vue/24/solid'
   background-size: contain;
 }
 
-.img.dark {
+.img-dark {
   background: url('https://github.com/cloworm/todo/blob/master/public/images/bg-desktop-dark.jpg?raw=true');
   background-position: top;
   background-repeat: no-repeat;

@@ -3,8 +3,15 @@
 // importar themeStore
 // importar taskStore
 // importar modelo de tarea
+import type { Task } from '@/models/Task';
+import { useTaskStore } from '@/stores/TaskStore';
+import { useThemeStore } from '@/stores/ThemeStore';
 import { reactive } from 'vue'
+const themeStore = useThemeStore()
+const theme = reactive(themeStore)
 
+const takStore = useTaskStore()
+const task = reactive(takStore)
 // iconos
 import { XMarkIcon, PlusCircleIcon } from '@heroicons/vue/24/outline'  
 import { CheckCircleIcon as SolidCircleIcon } from '@heroicons/vue/24/solid'
@@ -18,10 +25,11 @@ import { CheckCircleIcon as SolidCircleIcon } from '@heroicons/vue/24/solid'
 
 
 // una vez importado el modelo Task reemplazar any con el mismo
-const newTask: any = {
+const newTask: Task = {
   id:  0,
   tarea:  '',
-  completada: false
+  status: false
+  //completada: false
 }
 
 const reactiveTask = reactive(newTask)
@@ -29,50 +37,56 @@ const reactiveTask = reactive(newTask)
 // funcion para marcar tarea completada
 // deberia llamar
 function makeItComplete(){
-  reactiveTask.completada = !reactiveTask.completada
+  //reactiveTask.completada = !reactiveTask.completada
+    reactiveTask.status = !reactiveTask.status
 }
 
 // funcion para guardar tarea, debera pasar variable reactiveTask al metodo
 // en TaskStore
 function saveTask() {
   //store.addTask(reactiveTask)
+  task.addTask(reactiveTask)
 }
-
+function removeTask() {
+  //store.addTask(reactiveTask)
+  task.removeTask(reactiveTask)
+}
 </script>
 
 <template>
   <div class="wrapper relative group border-black">
     <div class="absolute top-3 sm:top-4 left-5">
-      <div class="relative">
+      <div class="relative" v-if="task.loading ? SolidCircleIcon : ''">
         <input
           type="ckeckbox"
           class="form-checkbox border rounded-full focus:ouline-none h-6 w-6 cursor-pointer transition ease-linear"
+          v-if="task.loading ? SolidCircleIcon : ''"
         />
         <!-- usar directiva v-if para mostrar si es tarea completa -->
         <!-- agregar directiva @click para llamar al metodo para completar tarea -->
-        <SolidCircleIcon class="h-100 w-100 absolute left-0 top-0 text-green-500"/>
+        <SolidCircleIcon class="h-100 w-100 absolute left-0 top-0 text-green-500"  @click="makeItComplete"/>
       </div>
     </div>
 
     <!-- input -->
-    <form @submit.prevent>
+    <form @submit.prevent :class="theme.isDark ? 'input.dark': 'input'">
 
       <!-- input: usar v-bind para definir si es modo oscuro -->
       <!-- usar v-model para pasar los datos de la nueva tarea -->
       <input
-
+        v-model="newTask.tarea"
         type="text"
         placeholder="Escribe una nueva tarea"
         class="sm:text-base overflow-ellipsis w-full focus:outline-none py-4 sm:py-4.5 pr-8 pl-14 sm:pl-16 cursor-pointer transition ease-linear"
       />
 
       <!-- div: usar v-bind para definir si es modo oscuro -->
-      <div class="btns absolute right-0 top-0 py-2 sm:py-2.5 px-2 w-20 h-14 flex justify-around cursor-default transition ease-linear" >
-        <button  class="p-1 cursor-pointer">
+      <div class=" absolute right-0 top-0 py-2 sm:py-2.5 px-2 w-20 h-14 flex justify-around cursor-default transition ease-linear" :class="theme.isDark ? 'btns.dark' : 'btns'">
+        <button  class="p-1 cursor-pointer" @click="saveTask">
           <!-- usar @click para usar metodo de guardar tareas -->
           <PlusCircleIcon class="w-6 h-6 hover:text-green-600"/>
         </button class="p-1 cursor-pointer">
-        <button >
+        <button  @click="removeTask">
           <XMarkIcon class="w-6 h-6 hover:text-red-500 "/>
         </button> 
       </div>
