@@ -11,8 +11,10 @@ export const useTaskStore = defineStore({
     }),
     actions: {
         addTask(task : Task): void{
+            let tId: number = this.data.length
+            let newTask: Task = {...task,id:tId}
             this.data.push(task)
-            console.log(this.data)
+            console.log(newTask)
         },
         removeTask(task : Task): void{
             const index = this.data.findIndex((item) => item.id == task.id);
